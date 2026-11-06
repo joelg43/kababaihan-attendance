@@ -5,51 +5,216 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kababaihan QR Attendance</title>
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:18px;background:#f2f5f9;color:#202938;font-family:Arial,sans-serif}
-main{max-width:480px;margin:auto;padding:22px;background:white;border-radius:18px;box-shadow:0 4px 20px #00000012}
-h2,.subtitle{text-align:center}
-.subtitle,.note{color:#657185;font-size:14px;line-height:1.5}
-#reader{width:100%;margin-top:16px}
-#status{margin:16px 0;padding:12px;border-radius:8px;background:#edf2f7;overflow-wrap:anywhere}
-#member{display:none;padding:14px;border:1px solid #dbe3ed;border-radius:12px}
-button{width:100%;padding:14px;margin-top:12px;border:0;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;background:#147d48;color:white}
-button:disabled{opacity:.6}
-#nextBtn{display:none;background:#e5eaf1;color:#243348}
-.note{text-align:center;font-size:12px}
-.success{background:#e4f7eb!important;color:#146c37}
-.duplicate{background:#fff3cd!important;color:#795900}
-.error{background:#fde8e8!important;color:#a32121}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 18px;
+  background: #eef3fb;
+  color: #202938;
+  font-family: Arial, sans-serif;
+}
+
+main {
+  max-width: 480px;
+  margin: auto;
+  padding: 22px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(20, 60, 120, 0.10);
+}
+
+h2, .subtitle {
+  text-align: center;
+}
+
+h2 {
+  color: #174a8b;
+}
+
+.subtitle, .note {
+  color: #657185;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#reader {
+  width: 100%;
+  margin-top: 16px;
+}
+
+#status {
+  margin: 16px 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: #edf2f7;
+  overflow-wrap: anywhere;
+}
+
+#member {
+  display: none;
+  padding: 14px;
+  border: 1px solid #dbe3ed;
+  border-radius: 12px;
+  background: #f7faff;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  background: linear-gradient(135deg, #1769c2, #398be8);
+  color: white;
+  box-shadow: 0 4px 12px rgba(25, 100, 190, 0.20);
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+#nextBtn {
+  display: none;
+  background: linear-gradient(135deg, #1769c2, #398be8);
+}
+
+.note {
+  text-align: center;
+  font-size: 12px;
+}
+
+.success {
+  background: #e4f7eb !important;
+  color: #146c37;
+}
+
+.duplicate {
+  background: #fff3cd !important;
+  color: #795900;
+}
+
+.error {
+  background: #fde8e8 !important;
+  color: #a32121;
+}
+
+/* Large attendance confirmation overlay */
+#successModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 25, 55, .72);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.success-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 30px 22px 24px;
+  border-radius: 24px;
+  text-align: center;
+  background: linear-gradient(145deg, #ffffff, #eaf3ff);
+  border: 2px solid #8fc2ff;
+  box-shadow: 0 16px 45px rgba(0, 30, 80, .30);
+}
+
+.success-card h1 {
+  margin: 0 0 14px;
+  color: #1559a6;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.success-card p {
+  margin: 12px 0 22px;
+  color: #183e70;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.success-card button {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 22px 12px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0753a6, #1685ed, #55a9ff);
+  color: #ffffff;
+  font-size: 21px;
+  box-shadow: 0 7px 18px rgba(10, 95, 190, .28);
+}
+
+.success-card.duplicate-card {
+  border-color: #e8c46b;
+  background: linear-gradient(145deg, #fffdf7, #fff2cf);
+}
+
+.success-card.duplicate-card h1 {
+  color: #946000;
+}
+
+.success-card.duplicate-card p {
+  color: #795900;
+}
+
+.success-card.duplicate-card button {
+  background: linear-gradient(135deg, #a66a00, #d99b16, #f0bd45);
+  box-shadow: 0 7px 18px rgba(150, 100, 0, .22);
+}
 </style>
 </head>
+
 <body>
 <main>
-<h2>Kababaihan Attendance</h2>
-<p class="subtitle">Scan the member's QR code to record attendance.</p>
+  <h2>Kababaihan Attendance</h2>
+  <p class="subtitle">Scan the member's QR code to record attendance.</p>
 
-<div id="reader"></div>
+  <div id="reader"></div>
 
-<div id="status" role="status" aria-live="polite">
-Press Start Camera and allow camera access.
-</div>
+  <div id="status" role="status" aria-live="polite">
+    Press Start Camera and allow camera access.
+  </div>
 
-<section id="member">
-<h3>Scanned Member</h3>
-<p><b>ID:</b> <span id="memberId"></span></p>
-<p><b>Name:</b> <span id="memberName"></span></p>
-<p><b>Barangay:</b> <span id="memberBarangay"></span></p>
-</section>
+  <section id="member">
+    <h3>Scanned Member</h3>
+    <p><b>ID:</b> <span id="memberId"></span></p>
+    <p><b>Name:</b> <span id="memberName"></span></p>
+    <p><b>Barangay:</b> <span id="memberBarangay"></span></p>
+  </section>
 
-<button id="startBtn" onclick="startScanner()">Start Camera</button>
-<button id="nextBtn" onclick="startScanner()">Scan Another QR Code</button>
+  <button id="startBtn" onclick="startScanner()">Start Camera</button>
+  <button id="nextBtn" onclick="startScanner()">Scan Another QR Code</button>
 
-<p class="note">Wait for the saved or duplicate confirmation before scanning the next member.</p>
+  <p class="note">Wait for the saved or duplicate confirmation before scanning the next member.</p>
 </main>
+
+<!-- Large success / duplicate alert -->
+<div id="successModal" style="display:none" role="dialog" aria-modal="true">
+  <div class="success-card" id="alertCard">
+    <h1 id="alertTitle">SUCCESS!</h1>
+    <p id="successName"></p>
+    <button onclick="closeSuccess()">OK – NEXT MEMBER</button>
+  </div>
+</div>
 
 <script>
 const API_URL =
-'https://script.google.com/macros/s/AKfycbx4qZCHjfgmcciOsSDRX4-CJl5g-fgLkAkao1EOd_9yI2vllMTsH98NP_79wo3aWk-P/exec';
+  'https://script.google.com/macros/s/AKfycbylNSCITi0hzzmVo1hwjYiaIMttHj2kCATMVftwSS5gXTtXaxCDirvk7wXWaPQk-bVM/exec';
 
 let scanner = null;
 let busy = false;
@@ -64,6 +229,33 @@ function showStatus(message, type) {
   statusBox.className = type || '';
 }
 
+function showAttendanceAlert(type, name, message) {
+  const modal = document.getElementById('successModal');
+  const card = document.getElementById('alertCard');
+  const title = document.getElementById('alertTitle');
+  const nameBox = document.getElementById('successName');
+
+  card.classList.toggle('duplicate-card', type === 'duplicate');
+
+  if (type === 'duplicate') {
+    title.textContent = '⚠ DUPLICATE SCAN!';
+    nameBox.textContent = name + '\n' + message;
+    showStatus('Duplicate attendance detected.', 'duplicate');
+  } else {
+    title.textContent = '✓ SUCCESS!';
+    nameBox.textContent = name + '\n' + message;
+    showStatus('Attendance successfully saved.', 'success');
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeSuccess() {
+  document.getElementById('successModal').style.display = 'none';
+  busy = false;
+  startScanner();
+}
+
 async function startScanner() {
   if (busy) return;
 
@@ -71,10 +263,13 @@ async function startScanner() {
   startBtn.disabled = true;
   startBtn.style.display = 'block';
   memberBox.style.display = 'none';
+
   showStatus('Opening camera...');
 
   try {
-    if (!scanner) scanner = new Html5Qrcode('reader');
+    if (!scanner) {
+      scanner = new Html5Qrcode('reader');
+    }
 
     if (scanner.isScanning) {
       await scanner.stop();
@@ -86,16 +281,16 @@ async function startScanner() {
         fps: 10,
         qrbox: function(width, height) {
           const size = Math.floor(Math.min(width, height) * 0.75);
-          return {width:size,height:size};
+          return { width: size, height: size };
         }
       },
       handleScan,
-      function(){}
+      function() {}
     );
 
     startBtn.style.display = 'none';
     showStatus('Camera ready. Point it at a member QR code.');
-  } catch(err) {
+  } catch (err) {
     startBtn.disabled = false;
     showStatus(
       'Camera could not start: ' + (err.message || err) +
@@ -122,7 +317,9 @@ async function handleScan(decodedText) {
       barangay: String(data.barangay || '').trim()
     };
 
-    if (!member.name) throw new Error('QR code is missing the member name.');
+    if (!member.name) {
+      throw new Error('QR code is missing the member name.');
+    }
 
     if (!member.id && !member.barangay) {
       throw new Error('QR must contain an ID or a barangay with the name.');
@@ -132,17 +329,19 @@ async function handleScan(decodedText) {
       await scanner.stop();
     }
 
-    document.getElementById('memberId').textContent = member.id || 'Not provided';
+    document.getElementById('memberId').textContent =
+      member.id || 'Not provided';
     document.getElementById('memberName').textContent = member.name;
-    document.getElementById('memberBarangay').textContent = member.barangay || 'Not provided';
-    memberBox.style.display = 'block';
+    document.getElementById('memberBarangay').textContent =
+      member.barangay || 'Not provided';
 
+    memberBox.style.display = 'block';
     showStatus('Checking attendance for ' + member.name + '...');
     startBtn.style.display = 'none';
 
     saveAttendance(member);
 
-  } catch(err) {
+  } catch (err) {
     busy = false;
     showStatus('Invalid QR code: ' + (err.message || err), 'error');
 
@@ -169,21 +368,29 @@ function saveAttendance(member) {
   });
 
   let finished = false;
+  let timeout;
 
   function cleanup() {
     if (finished) return;
     finished = true;
     script.remove();
-    try { delete window[callbackName]; } catch(e) {}
+    try {
+      delete window[callbackName];
+    } catch (e) {}
   }
 
-  const timeout = setTimeout(function() {
+  timeout = setTimeout(function() {
+    if (finished) return;
     cleanup();
     busy = false;
     startBtn.disabled = false;
-    startBtn.style.display = 'block';
-    nextBtn.style.display = 'none';
-    showStatus('No response from server. Check internet and deployment.', 'error');
+    startBtn.style.display = 'none';
+    nextBtn.textContent = 'TRY AGAIN';
+    nextBtn.style.display = 'block';
+    showStatus(
+      'No response from server. Check internet connection and Apps Script deployment.',
+      'error'
+    );
   }, 20000);
 
   window[callbackName] = function(result) {
@@ -191,31 +398,29 @@ function saveAttendance(member) {
 
     clearTimeout(timeout);
     cleanup();
-    busy = false;
 
-    if (result && result.success) {
-      showStatus('SUCCESS: Attendance saved for ' + result.name + '.', 'success');
-      alert('SUCCESS!\nAttendance saved for ' + result.name);
-      nextBtn.textContent = 'Scan Another QR Code';
-      nextBtn.style.display = 'block';
-      startBtn.style.display = 'none';
-
-    } else if (result && (result.duplicate || result.code === 'DUPLICATE')) {
-      showStatus(
-        'DUPLICATE: ' + (result.message || 'Attendance already recorded.'),
-        'duplicate'
+    if (result && result.duplicate) {
+      showAttendanceAlert(
+        'duplicate',
+        member.name,
+        'This member is already recorded.'
       );
-      alert('DUPLICATE!\nThis member is already recorded.');
-      nextBtn.textContent = 'Scan Next Member';
-      nextBtn.style.display = 'block';
-      startBtn.style.display = 'none';
+
+    } else if (result && result.success) {
+      showAttendanceAlert(
+        'success',
+        result.name || member.name,
+        'Attendance successfully recorded!'
+      );
 
     } else {
+      busy = false;
       showStatus(
-        'SAVE FAILED: ' + ((result && result.message) || 'Unknown server error.'),
+        'SAVE FAILED: ' +
+        ((result && result.message) || 'Unknown server error.'),
         'error'
       );
-      nextBtn.textContent = 'Try Again / Scan Another';
+      nextBtn.textContent = 'TRY AGAIN / SCAN ANOTHER';
       nextBtn.style.display = 'block';
       startBtn.style.display = 'none';
     }
@@ -223,12 +428,19 @@ function saveAttendance(member) {
 
   script.onerror = function() {
     if (finished) return;
+
     clearTimeout(timeout);
     cleanup();
     busy = false;
-    showStatus('Could not contact attendance server. Check the /exec URL and deployment access.', 'error');
-    nextBtn.textContent = 'Try Again';
+
+    showStatus(
+      'Could not contact attendance server. Check the /exec URL and deployment access.',
+      'error'
+    );
+
+    nextBtn.textContent = 'TRY AGAIN';
     nextBtn.style.display = 'block';
+    startBtn.style.display = 'none';
   };
 
   script.src = API_URL + '?' + params.toString();
